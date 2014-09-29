@@ -116,7 +116,9 @@ public class WordActivator implements SpeechActivator, RecognitionListener
 
     private void receiveWhatWasHeard(List<String> heard, float[] scores)
     {
-        boolean heardTargetWord = false;
+        Log.d(TAG, "heard: " + heard);
+        recognizeSpeechDirectly();
+        /*boolean heardTargetWord = false;
         // find the target word
         for (String possible : heard)
         {
@@ -138,7 +140,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
         {
             // keep going
             recognizeSpeechDirectly();
-        }
+        }*/
     }
 
     @Override
