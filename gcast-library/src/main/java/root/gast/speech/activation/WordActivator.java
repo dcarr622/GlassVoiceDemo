@@ -17,8 +17,14 @@ package root.gast.speech.activation;
 
 import java.util.List;
 
+import io.glassjournalism.glassgenius.Constants;
+import io.glassjournalism.glassgenius.SpeechSnippet;
+import io.glassjournalism.glassgenius.WebServiceAPI;
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import root.gast.speech.SpeechRecognitionUtil;
-import root.gast.speech.text.WordList;
 import root.gast.speech.text.match.SoundsLikeWordMatcher;
 import android.content.Context;
 import android.content.Intent;
@@ -44,9 +50,17 @@ public class WordActivator implements SpeechActivator, RecognitionListener
 
     private SpeechActivationListener resultListener;
 
+    private WebServiceAPI webServiceAPI;
+
     public WordActivator(Context context,
             SpeechActivationListener resultListener, String... targetWords)
     {
+
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(Constants.API_ROOT)
+                .build();
+
+        this.webServiceAPI = restAdapter.create(WebServiceAPI.class);
         this.context = context;
         this.matcher = new SoundsLikeWordMatcher(targetWords);
         this.resultListener = resultListener;
@@ -91,7 +105,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     public void onPartialResults(Bundle partialResults)
     {
         Log.d(TAG, "partial results");
-        receiveResults(partialResults);
+//        receiveResults(partialResults);
     }
 
     /**
@@ -117,6 +131,21 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     private void receiveWhatWasHeard(List<String> heard, float[] scores)
     {
         Log.d(TAG, "heard: " + heard);
+        //TODO @David: post to endpoint
+        SpeechSnippet heardSnippet = new SpeechSnippet();
+        heardSnippet.setText(heard.toString());
+        webServiceAPI.postSpeechSnippet(heardSnippet, new Callback<Response>() {
+            @Override
+            public void success(Response response, Response response2) {
+                Log.d(TAG, response.toString() + response2.toString());
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d(TAG, error.getResponse().toString());
+            }
+        });
+
         recognizeSpeechDirectly();
         /*boolean heardTargetWord = false;
         // find the target word

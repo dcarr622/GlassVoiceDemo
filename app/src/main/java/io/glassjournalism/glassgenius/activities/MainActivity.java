@@ -90,6 +90,8 @@ public class MainActivity extends Activity {
     protected void onPause() {
         mCardScroller.deactivate();
         super.onPause();
+        Intent stopService = SpeechActivationService.makeServiceStopIntent(this);
+        stopService(stopService);
     }
 
     /**
